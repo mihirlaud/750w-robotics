@@ -7,15 +7,18 @@
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 #include "vex.h"
+#include "Robot.h"
+#include "config.h"
 
 using namespace vex;
 
 // A global instance of vex::brain used for printing to the V5 brain screen
-vex::brain       Brain;
+
 // A global instance of vex::competition
-vex::competition Competition;
+
 
 // define your global instances of motors and other devices here
+
 
 
 /*---------------------------------------------------------------------------*/
@@ -31,7 +34,7 @@ vex::competition Competition;
 void pre_auton( void ) {
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
-  
+  g.startCalibration(1000);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -63,6 +66,7 @@ void autonomous( void ) {
 
 void usercontrol( void ) {
   // User control code here, inside the loop
+
   while (1) {
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo 
@@ -72,6 +76,15 @@ void usercontrol( void ) {
     // Insert user code here. This is where you use the joystick values to 
     // update your motors, etc.
     // ........................................................................
+    if(Controller.ButtonA.pressing()) {
+      Brain.Screen.print("Hello");
+    }
+
+    flywheel.setVelocity(Controller.Axis1.value(), vex::percentUnits::pct);
+    if(potent.value(vex::percentUnits::pct) > 75)
+      flywheel.stop();
+
+    Brain.Screen.print("%lf", g.value(vex::rotationUnits::deg));
 
     vex::task::sleep(20); //Sleep the task for a short amount of time to prevent wasted resources. 
   }
