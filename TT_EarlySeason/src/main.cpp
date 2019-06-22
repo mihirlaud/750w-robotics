@@ -84,7 +84,7 @@ void usercontrol( void ) {
     if(potent.value(vex::percentUnits::pct) > 75)
       flywheel.stop();
 
-    Brain.Screen.print("%lf", g.value(vex::rotationUnits::deg));
+    //Brain.Screen.print("%lf", g.value(vex::rotationUnits::deg));
 
     vex::task::sleep(20); //Sleep the task for a short amount of time to prevent wasted resources. 
   }
