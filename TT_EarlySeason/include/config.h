@@ -1,7 +1,14 @@
-vex::brain Brain;
-vex::competition Competition;
-vex::controller Controller(vex::controllerType::primary);
+vex::brain cortex;   
+//this defines the brain - called the default constructor because it does not take in any arguements// 
+//for c++, write your code in a condensed form rather than the long form//
 
-vex::motor flywheel(vex::PORT1);
-vex::pot potent(Brain.ThreeWirePort.A);
-vex::gyro g(Brain.ThreeWirePort.B);
+vex::competition Competition; 
+//default constructor//
+
+vex::controller joystick (vex::controllerType::primary); 
+//for controllers, you have to secify the type//  
+
+vex::motor drive_motor_1 (vex::PORT1);
+vex::motor drive_motor_2 (vex::PORT2);
+vex::motor drive_motor_3 (vex::PORT3);
+vex::motor drive_motor_4 (vex::PORT4);   
