@@ -34,7 +34,6 @@ using namespace vex;
 void pre_auton( void ) {
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
-  g.startCalibration(1000);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -68,27 +67,30 @@ void usercontrol( void ) {
   // User control code here, inside the loop
 
   while (1) {
-    // This is the main execution loop for the user control program.
-    // Each time through the loop your program should update motor + servo 
-    // values based on feedback from the joysticks.
 
-    // ........................................................................
-    // Insert user code here. This is where you use the joystick values to 
-    // update your motors, etc.
-    // ........................................................................
-    if(Controller.ButtonA.pressing()) {
-      Brain.Screen.print("Hello");
-    }
-
-    flywheel.setVelocity(Controller.Axis1.value(), vex::percentUnits::pct);
-    if(potent.value(vex::percentUnits::pct) > 75)
-      flywheel.stop();
-
-    //Brain.Screen.print("%lf", g.value(vex::rotationUnits::deg));
+    drive(joystick.Axis1.position(), joystick.Axis3.position());
 
     vex::task::sleep(20); //Sleep the task for a short amount of time to prevent wasted resources. 
   }
 }
+
+void drive(int x, int y) {
+  driveFL.setVelocity(y + x, vex::percentUnits::pct);
+  driveFR.setVelocity(y - x, vex::percentUnits::pct);
+  driveBL.setVelocity(y + x, vex::percentUnits::pct);
+  driveBR.setVelocity(y - x, vex::percentUnits::pct);
+}
+
+/*
+| XX |      | XX |
+| FL |      | FR | Forward/backward: all wheels, same direction
+| XX |      | XX |
+|    |      |    |
+|    |------|    |
+| XX |------| XX | Turning: left reversed from right
+| BL |      | BR |
+| XX |      | XX |
+*/
 
 //
 // Main will set up the competition functions and callbacks.
