@@ -8,10 +8,10 @@ vex::competition Competition;
 vex::controller joystick (vex::controllerType::primary); 
 //for controllers, you have to secify the type//  
 
-vex::motor drive_motor_1 (vex::PORT1);
-vex::motor drive_motor_2 (vex::PORT2);
-vex::motor drive_motor_3 (vex::PORT3);
-vex::motor drive_motor_4 (vex::PORT4);  
+vex::motor driveFL(vex::PORT1, false);
+vex::motor driveFR(vex::PORT2, false);
+vex::motor driveBL(vex::PORT3, false);
+vex::motor driveBR(vex::PORT4, false);
 
-void drive (int x, int y);
+void drive(int x, int y);
 //If you press "alt" and then click the different lines you want to write in, you can write multiple things at once//

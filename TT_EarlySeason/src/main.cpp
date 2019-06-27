@@ -68,6 +68,8 @@ void usercontrol( void ) {
   // User control code here, inside the loop
 
   while (1) {
+
+    drive( joystick.Axis1.position(), joystick.Axis3.position() );
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo 
     // values based on feedback from the joysticks.
@@ -88,6 +90,13 @@ void usercontrol( void ) {
 
     vex::task::sleep(20); //Sleep the task for a short amount of time to prevent wasted resources. 
   }
+}
+
+void drive(int x, int y){
+  driveFL.setVelocity(y + x, vex::percentUnits::pct);
+  driveFR.setVelocity(y - x, vex::percentUnits::pct);
+  driveBL.setVelocity(y + x, vex::percentUnits::pct);
+  driveBR.setVelocity(y - x, vex::percentUnits::pct);
 }
 
 //
