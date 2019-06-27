@@ -13,5 +13,5 @@ vex::motor drive_motor_2 (vex::PORT2);
 vex::motor drive_motor_3 (vex::PORT3);
 vex::motor drive_motor_4 (vex::PORT4);  
 
-void drive(int x, int y);
+void drive (int x, int y);
 //If you press "alt" and then click the different lines you want to write in, you can write multiple things at once//
