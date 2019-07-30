@@ -34,7 +34,7 @@ using namespace vex;
 void pre_auton( void ) {
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
-  g.startCalibration(1000);
+//  g.startCalibration(1000);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -70,6 +70,7 @@ void usercontrol( void ) {
   while (1) {
 
     drive( joystick.Axis1.position(), joystick.Axis3.position() );
+
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo 
     // values based on feedback from the joysticks.
@@ -78,13 +79,13 @@ void usercontrol( void ) {
     // Insert user code here. This is where you use the joystick values to 
     // update your motors, etc.
     // ........................................................................
-    if(Controller.ButtonA.pressing()) {
-      Brain.Screen.print("Hello");
-    }
+    //if(Controller.ButtonA.pressing()) {
+    //  Brain.Screen.print("Hello");
+    //}
 
-    flywheel.setVelocity(Controller.Axis1.value(), vex::percentUnits::pct);
-    if(potent.value(vex::percentUnits::pct) > 75)
-      flywheel.stop();
+    //flywheel.setVelocity(Controller.Axis1.value(), vex::percentUnits::pct);
+    //if(potent.value(vex::percentUnits::pct) > 75)
+    //  flywheel.stop();
 
     //Brain.Screen.print("%lf", g.value(vex::rotationUnits::deg));
 
@@ -97,6 +98,11 @@ void drive(int x, int y){
   driveFR.setVelocity(y - x, vex::percentUnits::pct);
   driveBL.setVelocity(y + x, vex::percentUnits::pct);
   driveBR.setVelocity(y - x, vex::percentUnits::pct);
+
+  driveFL.spin(directionType::fwd);
+  driveFR.spin(directionType::fwd);
+  driveBL.spin(directionType::fwd);
+  driveBR.spin(directionType::fwd);
 }
 
 //
