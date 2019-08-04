@@ -71,6 +71,39 @@ void usercontrol( void ) {
 
     drive( joystick.Axis1.position(), joystick.Axis3.position() );
 
+    if(joystick.ButtonR1.pressing()){
+      rollerL.setVelocity(50, vex::percentUnits::pct);
+      rollerR.setVelocity(50, vex::percentUnits::pct);
+
+      rollerL.spin(directionType::fwd);
+      rollerR.spin(directionType::fwd);
+    }
+    else if(joystick.ButtonR2.pressing()){
+      rollerL.setVelocity(-50, vex::percentUnits::pct);
+      rollerR.setVelocity(-50, vex::percentUnits::pct);
+
+      rollerL.spin(directionType::fwd);
+      rollerR.spin(directionType::fwd);
+    }
+    else{
+      rollerL.stop(/*brakeType::brake*/);
+      rollerR.stop(/*brakeType::brake*/);
+    }  
+    
+    if(joystick.ButtonL1.pressing()){
+      spine.setVelocity(50, vex::percentUnits::pct);
+
+      spine.spin(directionType::fwd);
+    }
+    else if(joystick.ButtonL2.pressing()){
+      spine.setVelocity(-50, vex::percentUnits::pct);
+
+      spine.spin(directionType::fwd);
+    }
+    else{
+      spine.stop(/*brakeType::brake*/);
+    }
+
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo 
     // values based on feedback from the joysticks.
