@@ -9,7 +9,6 @@
 #include "vex.h"
 #include "Robot.h"
 #include "config.h"
-#include "auton_selector.h"
 
 using namespace vex;
 
@@ -32,18 +31,10 @@ using namespace vex;
 /*  not every time that the robot is disabled.                               */
 /*---------------------------------------------------------------------------*/
 
-int auton_index = -1;
 void pre_auton( void ) {
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
-  AutonSelector selector(cortex);
-  
-  selector.addRedOption("GOAL SIDE", 0)
-          .addRedOption("ALLIANCE TOWER SIDE", 1)
-          .addBlueOption("GOAL SIDE", 2)
-          .addBlueOption("ALLIANCE TOWER SIDE", 3);
-  
-  auton_index = selector.getCode();
+//  g.startCalibration(1000);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -60,18 +51,7 @@ void autonomous( void ) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
-  switch(auton_index) {
-    case 0: //RED GOAL SIDE
-      break;
-    case 1: //RED TOWER SIDE
-      break;
-    case 2: //BLUE GOAL SIDE
-      break;
-    case 3: //BLUE TOWER SIDE
-      break;
-    default:
-      break;
-  }
+
 }
 
 /*---------------------------------------------------------------------------*/
@@ -93,14 +73,14 @@ void usercontrol( void ) {
 
     if(joystick.ButtonR1.pressing()){
       rollerL.setVelocity(50, vex::percentUnits::pct);
-      rollerR.setVelocity(-50, vex::percentUnits::pct);
+      rollerR.setVelocity(50, vex::percentUnits::pct);
 
       rollerL.spin(directionType::fwd);
       rollerR.spin(directionType::fwd);
     }
     else if(joystick.ButtonR2.pressing()){
       rollerL.setVelocity(-50, vex::percentUnits::pct);
-      rollerR.setVelocity(50, vex::percentUnits::pct);
+      rollerR.setVelocity(-50, vex::percentUnits::pct);
 
       rollerL.spin(directionType::fwd);
       rollerR.spin(directionType::fwd);
@@ -156,53 +136,6 @@ void drive(int x, int y){
   driveFR.spin(directionType::fwd);
   driveBL.spin(directionType::fwd);
   driveBR.spin(directionType::fwd);
-}
-
-void drive_for(int dist) {
-  driveFL.rotateFor(dist, rotationUnits::deg, 60, velocityUnits::pct, false);
-  driveFR.rotateFor(dist, rotationUnits::deg, 60, velocityUnits::pct, false);
-  driveBL.rotateFor(dist, rotationUnits::deg, 60, velocityUnits::pct, false);
-  driveBR.rotateFor(dist, rotationUnits::deg, 60, velocityUnits::pct, true);
-  task::sleep(250);
-}
-
-void cw_turn_for(int angle) {
-  driveFL.rotateFor(angle, rotationUnits::deg, 60, velocityUnits::pct, false);
-  driveFR.rotateFor(-angle, rotationUnits::deg, 60, velocityUnits::pct, false);
-  driveBL.rotateFor(angle, rotationUnits::deg, 60, velocityUnits::pct, false);
-  driveBR.rotateFor(-angle, rotationUnits::deg, 60, velocityUnits::pct, true);
-  task::sleep(250);
-}
-
-void ccw_turn_for(int angle) {
-  cw_turn_for(-angle);
-}
-
-void intake_in() {
-  rollerL.setVelocity(50, vex::percentUnits::pct);
-  rollerR.setVelocity(-50, vex::percentUnits::pct);
-  
-  rollerL.spin(directionType::fwd);
-  rollerR.spin(directionType::fwd);
-}
-
-void intake_out() {
-  rollerL.setVelocity(-50, vex::percentUnits::pct);
-  rollerR.setVelocity(50, vex::percentUnits::pct);
-  
-  rollerL.spin(directionType::fwd);
-  rollerR.spin(directionType::fwd);
-}
-
-void intake_stop() {  
-  rollerL.stop(brakeType::hold);
-  rollerR.stop(brakeType::hold);
-}
-
-
-void accumulator_to(int pos) {
-  spine.rotateTo(pos, rotationUnits::deg, 50, velocityUnits::pct);
-  task::sleep(250);
 }
 
 //
