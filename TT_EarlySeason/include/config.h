@@ -1,14 +1,14 @@
 //The encoder value needed for the robot to point turn one complete circle
-#define FULL_CIRCLE 1200
+#define FULL_CIRCLE 1100
 
 //The encoder value needed for the robot to move forward or backward one complete tile
-#define FULL_TILE 600
+#define FULL_TILE 660
 
 //The encoder position for the accumulator while stacking cubes
-#define STACKING_POS 1000
+#define STACKING_POS -200
 
 //The encoder position for the accumulator while intaking cubes
-#define INTAKING_POS 600
+#define INTAKING_POS 300
 
 
 //---------------------------------------------------------

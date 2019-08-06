@@ -6,7 +6,6 @@
 /*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
-#include "C:/Program Files (x86)/VEX Robotics/VEXcode/sdk/vexv5/include/vex_motorgroup.h"
 #include "vex.h"
 #include "Robot.h"
 #include "config.h"
@@ -35,19 +34,19 @@ using namespace vex;
 /*  not every time that the robot is disabled.                               */
 /*---------------------------------------------------------------------------*/
 
-int auton_index = -1;
+int auton_index = 3;
 void pre_auton( void ) {
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
-  AutonSelector selector(cortex);
+  // AutonSelector selector(cortex);
   
-  selector.addRedOption("GOAL SIDE", 0)
-          .addRedOption("ALLIANCE TOWER SIDE", 1)
-          .addBlueOption("GOAL SIDE", 2)
-          .addBlueOption("ALLIANCE TOWER SIDE", 3);
+  // selector.addRedOption("GOAL SIDE", 0)
+  //         .addRedOption("ALLIANCE TOWER SIDE", 1)
+  //         .addBlueOption("GOAL SIDE", 2)
+  //         .addBlueOption("ALLIANCE TOWER SIDE", 3);
   
-  auton_index = selector.getCode();
-  spine.resetRotation();
+  // auton_index = selector.getCode();
+  // spine.resetRotation();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -61,18 +60,18 @@ void pre_auton( void ) {
 /*---------------------------------------------------------------------------*/
 
 void drive_for(int dist, double speed=60) {
-  driveFL.rotateFor(dist, rotationUnits::deg, speed, velocityUnits::pct, false);
-  driveFR.rotateFor(dist, rotationUnits::deg, speed, velocityUnits::pct, false);
-  driveBL.rotateFor(dist, rotationUnits::deg, speed, velocityUnits::pct, false);
-  driveBR.rotateFor(dist, rotationUnits::deg, speed, velocityUnits::pct, true);
+  driveFL.rotateFor(directionType::fwd, dist, rotationUnits::deg, speed, velocityUnits::pct, false);
+  driveFR.rotateFor(directionType::fwd, -dist, rotationUnits::deg, speed, velocityUnits::pct, false);
+  driveBL.rotateFor(directionType::fwd, dist, rotationUnits::deg, speed, velocityUnits::pct, false);
+  driveBR.rotateFor(directionType::fwd, -dist, rotationUnits::deg, speed, velocityUnits::pct, true);
   task::sleep(250);
 }
 
 void cw_turn_for(int angle, double speed=60) {
-  driveFL.rotateFor(angle, rotationUnits::deg, speed, velocityUnits::pct, false);
-  driveFR.rotateFor(-angle, rotationUnits::deg, speed, velocityUnits::pct, false);
-  driveBL.rotateFor(angle, rotationUnits::deg, speed, velocityUnits::pct, false);
-  driveBR.rotateFor(-angle, rotationUnits::deg, speed, velocityUnits::pct, true);
+  driveFL.rotateFor(directionType::fwd, angle, rotationUnits::deg, speed, velocityUnits::pct, false);
+  driveFR.rotateFor(directionType::fwd, angle, rotationUnits::deg, speed, velocityUnits::pct, false);
+  driveBL.rotateFor(directionType::fwd, angle, rotationUnits::deg, speed, velocityUnits::pct, false);
+  driveBR.rotateFor(directionType::fwd, angle, rotationUnits::deg, speed, velocityUnits::pct, true);
   task::sleep(250);
 }
 
@@ -103,7 +102,7 @@ void intake_stop() {
 
 
 void accumulator_to(int pos, double speed=50) {
-  spine.rotateTo(pos, rotationUnits::deg, speed, velocityUnits::pct);
+  spine.rotateTo(pos, rotationUnits::deg, speed, velocityUnits::pct, true);
   task::sleep(250);
 }
 
@@ -112,73 +111,72 @@ void autonomous( void ) {
   // Insert autonomous user code here.
   // ..........................................................................
   switch(auton_index) {
+    case -1:
+      cw_turn_for(FULL_CIRCLE);
+      break;
     case 0: //RED GOAL SIDE
-      //Go forward until the accumulator can be deployed
-      drive_for(0.50 * FULL_TILE);
-      //Deploy accumulator
-      accumulator_to(STACKING_POS);
-      //Return accumulator to intaking position
-      accumulator_to(INTAKING_POS);
-      //Drive forward so that bot is closer to cubes
-      drive_for(0.50 * FULL_TILE);
-      //Begin intaking
-      intake_in();
-      //Drive forward to intake cubes
-      drive_for(2.0 * FULL_TILE);
-      //Stop intake
-      intake_stop();
-      //Drive backwards to be closer to goal
-      drive_for(-2.0 * FULL_TILE);
-      //Turn to align with goal
-      cw_turn_for(FULL_CIRCLE / 3);
-      //Drive up to goal
-      drive_for(1.5 * FULL_TILE);
-      //Ready accumulator for stacking
-      accumulator_to(STACKING_POS);
-      //Stack cubes into goal
-      intake_out();
-      //Delay for a short while so that cubes can stack
-      task::sleep(250);
-      //Stop intake
-      intake_stop();
-      //Drive backwards so that cubes count as scored
-      drive_for(1.0 * FULL_TILE, 30);
       break;
     case 1: //RED TOWER SIDE
-      break;
-    case 2: //BLUE GOAL SIDE
       //Go forward until the accumulator can be deployed
-      drive_for(0.50 * FULL_TILE);
+      drive_for(0.30 * FULL_TILE, 70);
       //Deploy accumulator
       accumulator_to(STACKING_POS);
       //Return accumulator to intaking position
       accumulator_to(INTAKING_POS);
       //Drive forward so that bot is closer to cubes
-      drive_for(0.50 * FULL_TILE);
+      drive_for(0.20 * FULL_TILE);
       //Begin intaking
       intake_in();
       //Drive forward to intake cubes
-      drive_for(2.0 * FULL_TILE);
+      drive_for(1.0 * FULL_TILE, 20);
       //Stop intake
       intake_stop();
       //Drive backwards to be closer to goal
-      drive_for(-2.0 * FULL_TILE);
+      drive_for(-1.0 * FULL_TILE);
       //Turn to align with goal
-      ccw_turn_for(FULL_CIRCLE / 3);
+      cw_turn_for(0.36 * FULL_CIRCLE);
       //Drive up to goal
-      drive_for(1.5 * FULL_TILE);
+      drive_for(0.93 * FULL_TILE);
       //Ready accumulator for stacking
       accumulator_to(STACKING_POS);
       //Stack cubes into goal
       intake_out();
       //Delay for a short while so that cubes can stack
-      task::sleep(250);
-      //Stop intake
-      intake_stop();
+      task::sleep(800);
       //Drive backwards so that cubes count as scored
-      drive_for(1.0 * FULL_TILE, 30);
+      drive_for(-1.0 * FULL_TILE, 20);
+      break;
+    case 2: //BLUE GOAL SIDE
       break;
     case 3: //BLUE TOWER SIDE
+      //Go forward until the accumulator can be deployed
+      drive_for(0.30 * FULL_TILE, 70);
+      //Deploy accumulator
+      accumulator_to(STACKING_POS);
+      //Return accumulator to intaking position
+      accumulator_to(INTAKING_POS);
+      //Drive forward so that bot is closer to cubes
+      drive_for(0.20 * FULL_TILE);
+      //Begin intaking
+      intake_in();
+      //Drive forward to intake cubes
+      drive_for(1.0 * FULL_TILE, 20);
+      //Stop intake
+      intake_stop();
+      //Drive backwards to be closer to goal
+      drive_for(-1.0 * FULL_TILE);
+      //Turn to align with goal
+      ccw_turn_for(0.36 * FULL_CIRCLE);
+      //Drive up to goal
+      drive_for(0.93 * FULL_TILE);
+      //Ready accumulator for stacking
+      accumulator_to(STACKING_POS);
+      //Stack cubes into goal
+      intake_out();
+      //Delay for a short while so that cubes can stack
+      task::sleep(800);
+      //Drive backwards so that cubes count as scored
+      drive_for(-1.0 * FULL_TILE, 20);
       break;
     default:
       break;
