@@ -1,3 +1,8 @@
+
+
+#define FULL_CIRCLE 1200
+#define FULL_TILE 600
+
 vex::brain cortex;   
 //this defines the brain - called the default constructor because it does not take in any arguements// 
 //for c++, write your code in a condensed form rather than the long form//
@@ -19,3 +24,10 @@ vex::motor spine(vex::PORT2, false);
 void drive(int x, int y);
 bool speedChange(bool newSpeed);
 //If you press "alt" and then click the different lines you want to write in, you can write multiple things at once//
+void drive_for(int dist);
+void cw_turn_for(int angle);
+void ccw_turn_for(int angle);
+void intake_in();
+void intake_out();
+void intake_stop();
+void accumulator_to(int pos);
