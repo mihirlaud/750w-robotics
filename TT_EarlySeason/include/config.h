@@ -1,7 +1,17 @@
-
-
+//The encoder value needed for the robot to point turn one complete circle
 #define FULL_CIRCLE 1200
+
+//The encoder value needed for the robot to move forward or backward one complete tile
 #define FULL_TILE 600
+
+//The encoder position for the accumulator while stacking cubes
+#define STACKING_POS 1000
+
+//The encoder position for the accumulator while intaking cubes
+#define INTAKING_POS 600
+
+
+//---------------------------------------------------------
 
 vex::brain cortex;   
 //this defines the brain - called the default constructor because it does not take in any arguements// 
@@ -24,10 +34,10 @@ vex::motor spine(vex::PORT2, false);
 void drive(int x, int y);
 bool speedChange(bool newSpeed);
 //If you press "alt" and then click the different lines you want to write in, you can write multiple things at once//
-void drive_for(int dist);
-void cw_turn_for(int angle);
-void ccw_turn_for(int angle);
-void intake_in();
-void intake_out();
+void drive_for(int dist, double speed);
+void cw_turn_for(int angle, double speed);
+void ccw_turn_for(int angle, double speed);
+void intake_in(double speed);
+void intake_out(double speed);
 void intake_stop();
-void accumulator_to(int pos);
+void accumulator_to(int pos, double speed);

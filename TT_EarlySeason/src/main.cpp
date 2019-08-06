@@ -6,6 +6,7 @@
 /*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
+#include "C:/Program Files (x86)/VEX Robotics/VEXcode/sdk/vexv5/include/vex_motorgroup.h"
 #include "vex.h"
 #include "Robot.h"
 #include "config.h"
@@ -46,6 +47,7 @@ void pre_auton( void ) {
           .addBlueOption("ALLIANCE TOWER SIDE", 3);
   
   auton_index = selector.getCode();
+  spine.resetRotation();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -58,16 +60,123 @@ void pre_auton( void ) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
+void drive_for(int dist, double speed=60) {
+  driveFL.rotateFor(dist, rotationUnits::deg, speed, velocityUnits::pct, false);
+  driveFR.rotateFor(dist, rotationUnits::deg, speed, velocityUnits::pct, false);
+  driveBL.rotateFor(dist, rotationUnits::deg, speed, velocityUnits::pct, false);
+  driveBR.rotateFor(dist, rotationUnits::deg, speed, velocityUnits::pct, true);
+  task::sleep(250);
+}
+
+void cw_turn_for(int angle, double speed=60) {
+  driveFL.rotateFor(angle, rotationUnits::deg, speed, velocityUnits::pct, false);
+  driveFR.rotateFor(-angle, rotationUnits::deg, speed, velocityUnits::pct, false);
+  driveBL.rotateFor(angle, rotationUnits::deg, speed, velocityUnits::pct, false);
+  driveBR.rotateFor(-angle, rotationUnits::deg, speed, velocityUnits::pct, true);
+  task::sleep(250);
+}
+
+void ccw_turn_for(int angle, double speed=60) {
+  cw_turn_for(-angle, speed);
+}
+
+void intake_in(double speed=50) {
+  rollerL.setVelocity(speed, vex::percentUnits::pct);
+  rollerR.setVelocity(-speed, vex::percentUnits::pct);
+  
+  rollerL.spin(directionType::fwd);
+  rollerR.spin(directionType::fwd);
+}
+
+void intake_out(double speed=50) {
+  rollerL.setVelocity(-speed, vex::percentUnits::pct);
+  rollerR.setVelocity(speed, vex::percentUnits::pct);
+  
+  rollerL.spin(directionType::fwd);
+  rollerR.spin(directionType::fwd);
+}
+
+void intake_stop() {  
+  rollerL.stop(brakeType::hold);
+  rollerR.stop(brakeType::hold);
+}
+
+
+void accumulator_to(int pos, double speed=50) {
+  spine.rotateTo(pos, rotationUnits::deg, speed, velocityUnits::pct);
+  task::sleep(250);
+}
+
 void autonomous( void ) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
   switch(auton_index) {
     case 0: //RED GOAL SIDE
+      //Go forward until the accumulator can be deployed
+      drive_for(0.50 * FULL_TILE);
+      //Deploy accumulator
+      accumulator_to(STACKING_POS);
+      //Return accumulator to intaking position
+      accumulator_to(INTAKING_POS);
+      //Drive forward so that bot is closer to cubes
+      drive_for(0.50 * FULL_TILE);
+      //Begin intaking
+      intake_in();
+      //Drive forward to intake cubes
+      drive_for(2.0 * FULL_TILE);
+      //Stop intake
+      intake_stop();
+      //Drive backwards to be closer to goal
+      drive_for(-2.0 * FULL_TILE);
+      //Turn to align with goal
+      cw_turn_for(FULL_CIRCLE / 3);
+      //Drive up to goal
+      drive_for(1.5 * FULL_TILE);
+      //Ready accumulator for stacking
+      accumulator_to(STACKING_POS);
+      //Stack cubes into goal
+      intake_out();
+      //Delay for a short while so that cubes can stack
+      task::sleep(250);
+      //Stop intake
+      intake_stop();
+      //Drive backwards so that cubes count as scored
+      drive_for(1.0 * FULL_TILE, 30);
       break;
     case 1: //RED TOWER SIDE
       break;
     case 2: //BLUE GOAL SIDE
+      //Go forward until the accumulator can be deployed
+      drive_for(0.50 * FULL_TILE);
+      //Deploy accumulator
+      accumulator_to(STACKING_POS);
+      //Return accumulator to intaking position
+      accumulator_to(INTAKING_POS);
+      //Drive forward so that bot is closer to cubes
+      drive_for(0.50 * FULL_TILE);
+      //Begin intaking
+      intake_in();
+      //Drive forward to intake cubes
+      drive_for(2.0 * FULL_TILE);
+      //Stop intake
+      intake_stop();
+      //Drive backwards to be closer to goal
+      drive_for(-2.0 * FULL_TILE);
+      //Turn to align with goal
+      ccw_turn_for(FULL_CIRCLE / 3);
+      //Drive up to goal
+      drive_for(1.5 * FULL_TILE);
+      //Ready accumulator for stacking
+      accumulator_to(STACKING_POS);
+      //Stack cubes into goal
+      intake_out();
+      //Delay for a short while so that cubes can stack
+      task::sleep(250);
+      //Stop intake
+      intake_stop();
+      //Drive backwards so that cubes count as scored
+      drive_for(1.0 * FULL_TILE, 30);
       break;
     case 3: //BLUE TOWER SIDE
       break;
@@ -154,7 +263,7 @@ void usercontrol( void ) {
 
 void drive(int x, int y){
  
-  if(driveSlow == false){
+  if(!driveSlow){
     driveFL.setVelocity(y + x, vex::percentUnits::pct);
     driveFR.setVelocity(y - x, vex::percentUnits::pct);
     driveBL.setVelocity(y + x, vex::percentUnits::pct);
@@ -182,53 +291,6 @@ void drive(int x, int y){
 
 bool speedChange(bool newSpeed){
   return !(newSpeed);
-}
-
-void drive_for(int dist) {
-  driveFL.rotateFor(dist, rotationUnits::deg, 60, velocityUnits::pct, false);
-  driveFR.rotateFor(dist, rotationUnits::deg, 60, velocityUnits::pct, false);
-  driveBL.rotateFor(dist, rotationUnits::deg, 60, velocityUnits::pct, false);
-  driveBR.rotateFor(dist, rotationUnits::deg, 60, velocityUnits::pct, true);
-  task::sleep(250);
-}
-
-void cw_turn_for(int angle) {
-  driveFL.rotateFor(angle, rotationUnits::deg, 60, velocityUnits::pct, false);
-  driveFR.rotateFor(-angle, rotationUnits::deg, 60, velocityUnits::pct, false);
-  driveBL.rotateFor(angle, rotationUnits::deg, 60, velocityUnits::pct, false);
-  driveBR.rotateFor(-angle, rotationUnits::deg, 60, velocityUnits::pct, true);
-  task::sleep(250);
-}
-
-void ccw_turn_for(int angle) {
-  cw_turn_for(-angle);
-}
-
-void intake_in() {
-  rollerL.setVelocity(50, vex::percentUnits::pct);
-  rollerR.setVelocity(-50, vex::percentUnits::pct);
-  
-  rollerL.spin(directionType::fwd);
-  rollerR.spin(directionType::fwd);
-}
-
-void intake_out() {
-  rollerL.setVelocity(-50, vex::percentUnits::pct);
-  rollerR.setVelocity(50, vex::percentUnits::pct);
-  
-  rollerL.spin(directionType::fwd);
-  rollerR.spin(directionType::fwd);
-}
-
-void intake_stop() {  
-  rollerL.stop(brakeType::hold);
-  rollerR.stop(brakeType::hold);
-}
-
-
-void accumulator_to(int pos) {
-  spine.rotateTo(pos, rotationUnits::deg, 50, velocityUnits::pct);
-  task::sleep(250);
 }
 
 //
