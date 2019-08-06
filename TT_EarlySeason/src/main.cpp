@@ -10,6 +10,8 @@
 #include "Robot.h"
 #include "config.h"
 
+bool driveSlow = false;
+
 using namespace vex;
 
 // A global instance of vex::brain used for printing to the V5 brain screen
@@ -69,39 +71,43 @@ void usercontrol( void ) {
 
   while (1) {
 
-    drive( joystick.Axis1.position(), joystick.Axis3.position() );
+  if(joystick.ButtonX.pressing()){
+    driveSlow = speedChange( driveSlow );
+  }
+
+    drive( joystick.Axis3.position(), joystick.Axis1.position() );
 
     if(joystick.ButtonR1.pressing()){
       rollerL.setVelocity(50, vex::percentUnits::pct);
-      rollerR.setVelocity(50, vex::percentUnits::pct);
+      rollerR.setVelocity(-50, vex::percentUnits::pct);
 
       rollerL.spin(directionType::fwd);
       rollerR.spin(directionType::fwd);
     }
     else if(joystick.ButtonR2.pressing()){
       rollerL.setVelocity(-50, vex::percentUnits::pct);
-      rollerR.setVelocity(-50, vex::percentUnits::pct);
+      rollerR.setVelocity(50, vex::percentUnits::pct);
 
       rollerL.spin(directionType::fwd);
       rollerR.spin(directionType::fwd);
     }
     else{
-      rollerL.stop(/*brakeType::brake*/);
-      rollerR.stop(/*brakeType::brake*/);
+      rollerL.stop(brakeType::hold);
+      rollerR.stop(brakeType::hold);
     }  
     
     if(joystick.ButtonL1.pressing()){
-      spine.setVelocity(50, vex::percentUnits::pct);
+      spine.setVelocity(20, vex::percentUnits::pct);
 
       spine.spin(directionType::fwd);
     }
     else if(joystick.ButtonL2.pressing()){
-      spine.setVelocity(-50, vex::percentUnits::pct);
+      spine.setVelocity(-20, vex::percentUnits::pct);
 
       spine.spin(directionType::fwd);
     }
     else{
-      spine.stop(/*brakeType::brake*/);
+      spine.stop(brakeType::hold);
     }
 
     // This is the main execution loop for the user control program.
@@ -127,15 +133,35 @@ void usercontrol( void ) {
 }
 
 void drive(int x, int y){
-  driveFL.setVelocity(y + x, vex::percentUnits::pct);
-  driveFR.setVelocity(y - x, vex::percentUnits::pct);
-  driveBL.setVelocity(y + x, vex::percentUnits::pct);
-  driveBR.setVelocity(y - x, vex::percentUnits::pct);
+ 
+  if(driveSlow == false){
+    driveFL.setVelocity(y + x, vex::percentUnits::pct);
+    driveFR.setVelocity(y - x, vex::percentUnits::pct);
+    driveBL.setVelocity(y + x, vex::percentUnits::pct);
+    driveBR.setVelocity(y - x, vex::percentUnits::pct);
 
-  driveFL.spin(directionType::fwd);
-  driveFR.spin(directionType::fwd);
-  driveBL.spin(directionType::fwd);
-  driveBR.spin(directionType::fwd);
+    driveFL.spin(directionType::fwd);
+    driveFR.spin(directionType::fwd);
+    driveBL.spin(directionType::fwd);
+    driveBR.spin(directionType::fwd);
+}
+
+  else{
+    driveFL.setVelocity((y + x)/3, vex::percentUnits::pct);
+    driveFR.setVelocity((y - x)/3, vex::percentUnits::pct);
+    driveBL.setVelocity((y + x)/3, vex::percentUnits::pct);
+    driveBR.setVelocity((y - x)/3, vex::percentUnits::pct);
+
+    driveFL.spin(directionType::fwd);
+    driveFR.spin(directionType::fwd);
+    driveBL.spin(directionType::fwd);
+    driveBR.spin(directionType::fwd);
+  }
+
+}
+
+bool speedChange(bool newSpeed){
+  return !(newSpeed);
 }
 
 //
