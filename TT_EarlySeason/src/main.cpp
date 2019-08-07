@@ -6,6 +6,9 @@
 /*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
+#include "C:/Program Files (x86)/VEX Robotics/VEXcode/sdk/vexv5/gcc/include/stdio.h"
+//#include "C:/Program Files (x86)/VEX Robotics/VEXcode/sdk/vexv5/include/vex_brain.h"
+//#include "C:/Program Files (x86)/VEX Robotics/VEXcode/sdk/vexv5/include/vex_controller.h"
 #include "vex.h"
 #include "Robot.h"
 #include "config.h"
@@ -198,22 +201,23 @@ void usercontrol( void ) {
 
   while (1) {
 
-  if(joystick.ButtonX.pressing()){
-    driveSlow = speedChange( driveSlow );
-  }
-
+    if(joystick.ButtonA.pressing()){
+      vex::task::sleep(100);
+      driveSlow = !driveSlow;
+    }
+    
     drive( joystick.Axis3.position(), joystick.Axis1.position() );
 
     if(joystick.ButtonR1.pressing()){
-      rollerL.setVelocity(50, vex::percentUnits::pct);
-      rollerR.setVelocity(-50, vex::percentUnits::pct);
+      rollerL.setVelocity(70, vex::percentUnits::pct);
+      rollerR.setVelocity(-70, vex::percentUnits::pct);
 
       rollerL.spin(directionType::fwd);
       rollerR.spin(directionType::fwd);
     }
     else if(joystick.ButtonR2.pressing()){
-      rollerL.setVelocity(-50, vex::percentUnits::pct);
-      rollerR.setVelocity(50, vex::percentUnits::pct);
+      rollerL.setVelocity(-70, vex::percentUnits::pct);
+      rollerR.setVelocity(70, vex::percentUnits::pct);
 
       rollerL.spin(directionType::fwd);
       rollerR.spin(directionType::fwd);
@@ -287,9 +291,6 @@ void drive(int x, int y){
 
 }
 
-bool speedChange(bool newSpeed){
-  return !(newSpeed);
-}
 
 //
 // Main will set up the competition functions and callbacks.
@@ -304,6 +305,10 @@ int main() {
        
     //Prevent main from exiting with an infinite loop.                        
     while(1) {
+      if(driveSlow)
+        joystick.Screen.print("Slow");
+      else
+        joystick.Screen.print("Fast");
       vex::task::sleep(100);//Sleep the task for a short amount of time to prevent wasted resources.
     }    
        

@@ -32,7 +32,6 @@ vex::motor rollerR(vex::PORT3, false);
 vex::motor spine(vex::PORT2, false);
 
 void drive(int x, int y);
-bool speedChange(bool newSpeed);
 //If you press "alt" and then click the different lines you want to write in, you can write multiple things at once//
 void drive_for(int dist, double speed);
 void cw_turn_for(int angle, double speed);
