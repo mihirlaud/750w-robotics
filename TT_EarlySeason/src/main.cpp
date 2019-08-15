@@ -37,7 +37,7 @@ using namespace vex;
 /*  not every time that the robot is disabled.                               */
 /*---------------------------------------------------------------------------*/
 
-int auton_index = 3;
+int auton_index = 1;
 void pre_auton( void ) {
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
@@ -120,6 +120,7 @@ void autonomous( void ) {
     case 0: //RED GOAL SIDE
       break;
     case 1: //RED TOWER SIDE
+    /*
       //Go forward until the accumulator can be deployed
       drive_for(0.30 * FULL_TILE, 70);
       //Deploy accumulator
@@ -148,10 +149,20 @@ void autonomous( void ) {
       task::sleep(800);
       //Drive backwards so that cubes count as scored
       drive_for(-1.0 * FULL_TILE, 20);
+      */
+
+//Tanav's scuffed auton RED
+      drive_for(.3 * FULL_TILE);
+      intake_out();
+      task::sleep(800);
+      drive_for(-1.0 * FULL_TILE, 20);
+      intake_stop();
+
       break;
     case 2: //BLUE GOAL SIDE
       break;
     case 3: //BLUE TOWER SIDE
+    /*
       //Go forward until the accumulator can be deployed
       drive_for(0.30 * FULL_TILE, 70);
       //Deploy accumulator
@@ -180,6 +191,17 @@ void autonomous( void ) {
       task::sleep(800);
       //Drive backwards so that cubes count as scored
       drive_for(-1.0 * FULL_TILE, 20);
+      */
+
+//Tanav's scuffed auton BLUE
+      drive_for(.3 * FULL_TILE);
+      intake_out();
+      task::sleep(800);
+      drive_for(-1.0 * FULL_TILE, 20);
+      intake_stop();
+
+
+
       break;
     default:
       break;
