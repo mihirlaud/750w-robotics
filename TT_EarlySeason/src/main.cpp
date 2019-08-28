@@ -13,7 +13,6 @@
 #include "Robot.h"
 #include "config.h"
 #include "auton_selector.h"
-#include<cmath>
 
 bool driveSlow = false;
 
@@ -289,10 +288,10 @@ void usercontrol( void ) {
 void drive(int x, int y){
  
   if(!driveSlow){
-    driveFL.setVelocity(100-(sqrt(10000-(pow(y+x,2)))), vex::percentUnits::pct);
-    driveFR.setVelocity(100-(sqrt(10000-(pow(y-x,2)))), vex::percentUnits::pct);
-    driveBL.setVelocity(100-(sqrt(10000-(pow(y+x,2)))), vex::percentUnits::pct);
-    driveBR.setVelocity(100-(sqrt(10000-(pow(y-x,2)))), vex::percentUnits::pct);
+    driveFL.setVelocity(y + x, vex::percentUnits::pct);
+    driveFR.setVelocity(y - x, vex::percentUnits::pct);
+    driveBL.setVelocity(y + x, vex::percentUnits::pct);
+    driveBR.setVelocity(y - x, vex::percentUnits::pct);
 
     driveFL.spin(directionType::fwd);
     driveFR.spin(directionType::fwd);
