@@ -1,4 +1,5 @@
 //The encoder value needed for the robot to point turn one complete circle
+#include "C:/Program Files (x86)/VEX Robotics/VEXcode/sdk/vexv5/include/vex_global.h"
 #define FULL_CIRCLE 1100
 
 //The encoder value needed for the robot to move forward or backward one complete tile
@@ -20,7 +21,7 @@
 #define LOW_POS 100
 
 vex::brain cortex;   
-//this defines the brain - called the default constructor because it does not take in any arguements// 
+//this defines the brain - called the default constructor because it does not take in any arguments//
 //for c++, write your code in a condensed form rather than the long form//
 
 vex::competition Competition; 
@@ -29,10 +30,11 @@ vex::competition Competition;
 vex::controller joystick (vex::controllerType::primary); 
 //for controllers, you have to specify the type//  
 
-vex::motor driveFL(vex::PORT20, false);
-vex::motor driveFR(vex::PORT3, false);
-vex::motor driveBL(vex::PORT4, false);
-vex::motor driveBR(vex::PORT5, false);
+vex::motor driveFL(vex::PORT4, false);
+vex::motor driveBL(vex::PORT2, false);
+vex::motor driveFR(vex::PORT5, false);
+vex::motor driveBR(vex::PORT3, false);
+
 vex::motor intakeL(vex::PORT11, false);
 vex::motor intakeR(vex::PORT3, false);
 vex::motor liftL(vex::PORT2, false);
@@ -41,8 +43,7 @@ vex::motor liftR(vex::PORT10, false);
 vex::pot potentiometerL(cortex.ThreeWirePort.A);
 vex::pot potentiometerR(cortex.ThreeWirePort.B);
 
-void drive(int x, int y);
-void tower(int mode, int type);
+void tower(int mode, bool type);
 void stack();
 
 void drive_for(int dist, double speed);
