@@ -5,10 +5,10 @@
 #define FULL_TILE 660
 
 //The encoder position for the accumulator while stacking cubes
-#define STACKING_POS -200
+#define STACKING_POS -100
 
 //The encoder position for the accumulator while intaking cubes
-#define INTAKING_POS 300
+#define INTAKING_POS 100
 
 
 //---------------------------------------------------------

@@ -122,13 +122,13 @@ void autonomous( void ) {
     case 1: //RED TOWER SIDE
     /*
       //Go forward until the accumulator can be deployed
-      drive_for(0.30 * FULL_TILE, 70);
+      drive_for(0.25 * FULL_TILE, 100);
       //Deploy accumulator
-      accumulator_to(STACKING_POS);
+      accumulator_to(STACKING_POS, 100);
       //Return accumulator to intaking position
       accumulator_to(INTAKING_POS);
       //Drive forward so that bot is closer to cubes
-      drive_for(0.20 * FULL_TILE);
+      //drive_for(0.20 * FULL_TILE);
       //Begin intaking
       intake_in();
       //Drive forward to intake cubes
@@ -164,13 +164,13 @@ void autonomous( void ) {
     case 3: //BLUE TOWER SIDE
     /*
       //Go forward until the accumulator can be deployed
-      drive_for(0.30 * FULL_TILE, 70);
+      drive_for(0.25 * FULL_TILE, 100);
       //Deploy accumulator
-      accumulator_to(STACKING_POS);
+      accumulator_to(STACKING_POS, 100);
       //Return accumulator to intaking position
       accumulator_to(INTAKING_POS);
       //Drive forward so that bot is closer to cubes
-      drive_for(0.20 * FULL_TILE);
+      //drive_for(0.20 * FULL_TILE);
       //Begin intaking
       intake_in();
       //Drive forward to intake cubes
