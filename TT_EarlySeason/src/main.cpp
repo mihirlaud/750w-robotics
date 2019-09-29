@@ -4,7 +4,7 @@
 #include "auton_selector.h"
 #include <cmath>
 
-int height = 0;
+bool slowDrive = false;
 
 using namespace vex;
 
@@ -76,6 +76,14 @@ void accumulator_to(int pos, double speed=50) {
 
   task::sleep(250);
 }
+
+void lift_to(int pos, double speed=50) {
+  liftL.rotateTo(pos, rotationUnits::deg, speed, velocityUnits::pct, false);
+  liftR.rotateTo(pos, rotationUnits::deg, speed, velocityUnits::pct, false);
+
+  task::sleep(250);
+}
+
 void lift_reset(double speed=50) {
   liftL.rotateTo(0, rotationUnits::deg, speed, velocityUnits::pct, false);
   liftR.rotateTo(0, rotationUnits::deg, speed, velocityUnits::pct, true);
@@ -111,16 +119,28 @@ void usercontrol( void ) {
 
   while (1) {
 
+    if(joystick.ButtonA.pressing()){
+      vex::task::sleep(100);
+
+      slowDrive = !slowDrive;
+    }
+
     if(joystick.ButtonL1.pressing()){
       vex::task::sleep(100);
 
-      tower(height, true);
+      lift_to(LOW_POS);
+      
+      liftL.stop(vex::brakeType::hold);
+      liftR.stop(vex::brakeType::hold);
     }
 
     if(joystick.ButtonL2.pressing()){
       vex::task::sleep(100);
 
-      tower(height, false);
+      lift_to(MID_POS);
+
+      liftL.stop(vex::brakeType::hold);
+      liftR.stop(vex::brakeType::hold);
     }
 
     if(joystick.ButtonR1.pressing()){
@@ -142,11 +162,11 @@ void usercontrol( void ) {
       intakeR.stop(vex::brakeType::hold);
     }
 
-  if(joystick.ButtonLeft.pressing()) {
+    if(joystick.ButtonLeft.pressing()) {
       driveFL.spin(vex::directionType::fwd, 25, vex::percentUnits::pct);
       driveBL.spin(vex::directionType::fwd, 25, vex::percentUnits::pct);
-      driveFR.spin(vex::directionType::rev, 25, vex::percentUnits::pct);  
-      driveBR.spin(vex::directionType::rev, 25, vex::percentUnits::pct);  
+      driveFR.spin(vex::directionType::rev, 25, vex::percentUnits::pct);
+      driveBR.spin(vex::directionType::rev, 25, vex::percentUnits::pct);
     } 
     else if(joystick.ButtonRight.pressing()) {  
       driveFL.spin(vex::directionType::fwd, -25, vex::percentUnits::pct);
@@ -154,11 +174,23 @@ void usercontrol( void ) {
       driveFR.spin(vex::directionType::rev, -25, vex::percentUnits::pct);
       driveBR.spin(vex::directionType::rev, -25, vex::percentUnits::pct);
     }
+    else if(slowDrive) {
+      driveFL.spin(vex::directionType::fwd, (joystick.Axis3.position(vex::percentUnits::pct)  + joystick.Axis1.position(vex::percentUnits::pct))/3.0, vex::percentUnits::pct);
+      driveBL.spin(vex::directionType::fwd, (-joystick.Axis3.position(vex::percentUnits::pct) - joystick.Axis1.position(vex::percentUnits::pct))/3.0, vex::percentUnits::pct);
+      driveFR.spin(vex::directionType::rev, (joystick.Axis3.position(vex::percentUnits::pct)  - joystick.Axis1.position(vex::percentUnits::pct))/3.0, vex::percentUnits::pct);
+      driveBR.spin(vex::directionType::rev, (-joystick.Axis3.position(vex::percentUnits::pct) + joystick.Axis1.position(vex::percentUnits::pct))/3.0, vex::percentUnits::pct);
+    
+      joystick.Screen.clearScreen();
+      joystick.Screen.print("Slow");
+    }
     else {
       driveFL.spin(vex::directionType::fwd, joystick.Axis3.position(vex::percentUnits::pct)  + joystick.Axis1.position(vex::percentUnits::pct), vex::percentUnits::pct);
       driveBL.spin(vex::directionType::fwd, -joystick.Axis3.position(vex::percentUnits::pct) - joystick.Axis1.position(vex::percentUnits::pct), vex::percentUnits::pct);
       driveFR.spin(vex::directionType::rev, joystick.Axis3.position(vex::percentUnits::pct)  - joystick.Axis1.position(vex::percentUnits::pct), vex::percentUnits::pct);
-      driveBR.spin(vex::directionType::rev, -joystick.Axis3.position(vex::percentUnits::pct) + joystick.Axis1.position(vex::percentUnits::pct), vex::percentUnits::pct);
+      driveBR.spin(vex::directionType::rev, -joystick.Axis3.position(vex::percentUnits::pct) + joystick.Axis1.position(vex::percentUnits::pct), vex::percentUnits::pct);      
+    
+      joystick.Screen.clearScreen();
+      joystick.Screen.print("Fast");    
     }
 
     if(joystick.ButtonUp.pressing()){
@@ -169,46 +201,20 @@ void usercontrol( void ) {
 
     if(joystick.ButtonX.pressing()){
       vex::task::sleep(100);
-      height++;
-
-      if(height == 3)
-        height = 0;
-
-      joystick.Screen.clearScreen();
-        if(height == 0)
-          joystick.Screen.print("Low");
-        else if(height == 1)
-          joystick.Screen.print("Mid");
-        else
-          joystick.Screen.print("High");
+     
+     lift_reset();
     }
 
     if(joystick.ButtonA.pressing()){
-      vex::task::sleep(100);
-      height--;
-
-      if(height == -1)
-        height = 2;
-
-      joystick.Screen.clearScreen();
-        if(height == 0)
-          joystick.Screen.print("Low");
-        else if(height == 1)
-          joystick.Screen.print("Mid");
-        else
-          joystick.Screen.print("High");
-    }
-
-    if(joystick.ButtonY.pressing()){
-      liftL.setVelocity(-25, vex::percentUnits::pct);
-      liftR.setVelocity(-25, vex::percentUnits::pct);
+      liftL.setVelocity(25, vex::percentUnits::pct);
+      liftR.setVelocity(25, vex::percentUnits::pct);
 
       liftL.spin(vex::directionType::fwd);
       liftR.spin(vex::directionType::fwd);
     }
-    else if(joystick.ButtonB.pressing()){
-      liftL.setVelocity(25, vex::percentUnits::pct);
-      liftR.setVelocity(25, vex::percentUnits::pct);
+    else if(joystick.ButtonY.pressing()){
+      liftL.setVelocity(-25, vex::percentUnits::pct);
+      liftR.setVelocity(-25, vex::percentUnits::pct);
 
       liftL.spin(vex::directionType::fwd);
       liftR.spin(vex::directionType::fwd);
@@ -219,106 +225,6 @@ void usercontrol( void ) {
     }
 
     vex::task::sleep(20); //Sleep the task for a short amount of time to prevent wasted resources. 
-  }
-}
-
-void tower(int mode, bool type) {
-
-double valL = potentiometerL.value(vex::rotationUnits::deg);
-double valR = potentiometerR.value(vex::rotationUnits::deg);
-double valAvg = (valL + valR)/2.0;
-
-  switch(mode) {
-    case 0: {
-      while( fabs( (LOW_POS - valL)) > .1 ){
-        valL = potentiometerL.value(vex::rotationUnits::deg);
-        valR = potentiometerR.value(vex::rotationUnits::deg);
-
-        double low_errorL = LOW_POS - valL;
-        double low_errorR = LOW_POS - valR;
-        double low_errorAvg = (low_errorL + low_errorR)/2.0;
-
-        double low_kP = .100;
-
-        liftL.setVelocity(low_errorL * low_kP, vex::percentUnits::pct);
-        liftR.setVelocity(low_errorL * low_kP, vex::percentUnits::pct);
-      }
-        liftL.stop(vex::brakeType::hold);
-        liftR.stop(vex::brakeType::hold);
-
-        if(type) {
-          intake_in();
-          vex::task::sleep(800);
-          intake_stop();
-        }
-        else {
-          intake_out();
-          vex::task::sleep(800);
-          intake_stop();
-        }
-        lift_reset();
-      break;
-    }
-    case 1: {
-      while( fabs( (MID_POS - valL)) > .1 ){
-        valL = potentiometerL.value(vex::rotationUnits::deg);
-        valR = potentiometerR.value(vex::rotationUnits::deg);
-
-        double mid_errorL = MID_POS - valL;
-        double mid_errorR = MID_POS - valR;
-        double mid_errorAvg = (mid_errorL + mid_errorR)/2.0;
-
-        double mid_kP = .100;
-
-        liftL.setVelocity(mid_errorL * mid_kP, vex::percentUnits::pct);
-        liftR.setVelocity(mid_errorL * mid_kP, vex::percentUnits::pct);
-      }
-        liftL.stop(vex::brakeType::hold);
-        liftR.stop(vex::brakeType::hold);
-
-        if(type) {
-          intake_in();
-          vex::task::sleep(800);
-          intake_stop();
-        }
-        else {
-          intake_out();
-          vex::task::sleep(800);
-          intake_stop();
-        }
-        lift_reset();
-      break;
-    }
-    case 2: {
-      while( fabs( (HIGH_POS - valL)) > .1 ){
-        valL = potentiometerL.value(vex::rotationUnits::deg);
-        valR = potentiometerR.value(vex::rotationUnits::deg);
-
-        double high_errorL = HIGH_POS - valL;
-        double high_errorR = HIGH_POS - valR;
-        double high_errorAvg = (high_errorL + high_errorR)/2.0;
-
-        double high_kP = .100;
-
-        liftL.setVelocity(high_errorL * high_kP, vex::percentUnits::pct);
-        liftR.setVelocity(high_errorL * high_kP, vex::percentUnits::pct);
-      }
-        liftL.stop(vex::brakeType::hold);
-        liftR.stop(vex::brakeType::hold);
-
-        if(type) {
-          intake_in();
-          vex::task::sleep(800);
-          intake_stop();
-        }
-        else {
-          intake_out();
-          vex::task::sleep(800);
-          intake_stop();
-        }
-        lift_reset();
-      break;
-    }
   }
 }
 
@@ -345,7 +251,6 @@ int main() {
        
     //Prevent main from exiting with an infinite loop.                        
     while(1) {
-      cortex.Screen.printAt(1, 20, "rotation: %f degrees", potentiometerR.value(rotationUnits::deg));
       vex::task::sleep(100);//Sleep the task for a short amount of time to prevent wasted resources.
     }    
        
