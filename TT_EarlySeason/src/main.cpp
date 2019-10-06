@@ -1,12 +1,13 @@
+//#include "C:/Program Files (x86)/VEX Robotics/VEXcode/sdk/vexv5/include/vex_units.h"
 #include "vex.h"
 #include "Robot.h"
 #include "config.h"
 #include "auton_selector.h"
 #include <cmath>
 
-bool slowDrive = false;
-
 using namespace vex;
+
+bool height = false; //False = Low; True = Mid
 
 int auton_index = -1;
 void pre_auton( void ) {
@@ -23,8 +24,8 @@ void pre_auton( void ) {
   // auton_index = selector.getCode();
   // spine.resetRotation();
 
-  liftL.resetRotation();
-  liftR.resetRotation();
+  lift.resetRotation();
+  tilter.resetRotation();
 }
 
 void drive_for(int dist, double speed=60) {
@@ -32,6 +33,7 @@ void drive_for(int dist, double speed=60) {
   driveFR.rotateFor(vex::directionType::fwd, -dist, rotationUnits::deg, speed, velocityUnits::pct, false);
   driveBL.rotateFor(vex::directionType::fwd, dist, rotationUnits::deg, speed, velocityUnits::pct, false);
   driveBR.rotateFor(vex::directionType::fwd, -dist, rotationUnits::deg, speed, velocityUnits::pct, true);
+
   task::sleep(250);
 }
 
@@ -48,58 +50,41 @@ void ccw_turn_for(int angle, double speed=60) {
 }
 
 void intake_in(double speed=50) {
-  intakeL.setVelocity(speed, vex::percentUnits::pct);
-  intakeR.setVelocity(-speed, vex::percentUnits::pct);
+  rollerL.setVelocity(speed, vex::percentUnits::pct);
+  rollerR.setVelocity(-speed, vex::percentUnits::pct);
   
-  intakeL.spin(vex::directionType::fwd);
-  intakeR.spin(vex::directionType::fwd);
+  rollerL.spin(vex::directionType::fwd);
+  rollerR.spin(vex::directionType::fwd);
 }
 
 void intake_out(double speed=50) {
-  intakeL.setVelocity(-speed, vex::percentUnits::pct);
-  intakeR.setVelocity(speed, vex::percentUnits::pct);
+  rollerL.setVelocity(-speed, vex::percentUnits::pct);
+  rollerR.setVelocity(speed, vex::percentUnits::pct);
   
-  intakeL.spin(vex::directionType::fwd);
-  intakeR.spin(vex::directionType::fwd);
+  rollerL.spin(vex::directionType::fwd);
+  rollerR.spin(vex::directionType::fwd);
 }
 
 void intake_stop() {  
-  intakeL.stop(vex::brakeType::hold);
-  intakeR.stop(vex::brakeType::hold);
-}
-
-void accumulator_to(int pos, double speed=50) {
-  driveFL.rotateFor(pos, rotationUnits::deg, speed, velocityUnits::pct, false);
-  driveFR.rotateFor(pos, rotationUnits::deg, speed, velocityUnits::pct, false);
-  driveBL.rotateFor(-pos, rotationUnits::deg, speed, velocityUnits::pct, false);
-  driveBR.rotateFor(-pos, rotationUnits::deg, speed, velocityUnits::pct, true);
-
-  task::sleep(250);
-}
-
-void lift_to(int pos, double speed=50) {
-  liftL.rotateTo(pos, rotationUnits::deg, speed, velocityUnits::pct, false);
-  liftR.rotateTo(pos, rotationUnits::deg, speed, velocityUnits::pct, false);
-
-  task::sleep(250);
-}
-
-void lift_reset(double speed=50) {
-  liftL.rotateTo(0, rotationUnits::deg, speed, velocityUnits::pct, false);
-  liftR.rotateTo(0, rotationUnits::deg, speed, velocityUnits::pct, true);
-
-  task::sleep(250);
+  rollerL.stop(vex::brakeType::hold);
+  rollerR.stop(vex::brakeType::hold);
 }
 
 void autonomous( void ) {
   
   switch(auton_index) {
     case -1: //TESTING AUTON
+
+      drive_for(.30 * FULL_TILE);
+      intake_out();
+      vex::task::sleep(800);
+      intake_stop();
+
       break;
     case 0: //RED GOAL SIDE
 
       drive_for(0.30 * FULL_TILE, 70);
-      accumulator_to(INTAKING_POS);
+      accumulatorTo(INTAKING_POS);
       drive_for(0.20 * FULL_TILE);
       intake_in();
       drive_for(1.0 * FULL_TILE, 20);
@@ -119,129 +104,208 @@ void usercontrol( void ) {
 
   while (1) {
 
-    if(joystick.ButtonA.pressing()){
-      vex::task::sleep(100);
-
-      slowDrive = !slowDrive;
-    }
-
-    if(joystick.ButtonL1.pressing()){
-      vex::task::sleep(100);
-
-      lift_to(LOW_POS);
-      
-      liftL.stop(vex::brakeType::hold);
-      liftR.stop(vex::brakeType::hold);
-    }
-
-    if(joystick.ButtonL2.pressing()){
-      vex::task::sleep(100);
-
-      lift_to(MID_POS);
-
-      liftL.stop(vex::brakeType::hold);
-      liftR.stop(vex::brakeType::hold);
-    }
+    drive( joystick.Axis3.position(), joystick.Axis1.position() );
 
     if(joystick.ButtonR1.pressing()){
-      intakeL.setVelocity(70, vex::percentUnits::pct);
-      intakeR.setVelocity(-70, vex::percentUnits::pct);
+      rollerL.setVelocity(70, vex::percentUnits::pct);
+      rollerR.setVelocity(-70, vex::percentUnits::pct);
 
-      intakeL.spin(vex::directionType::fwd);
-      intakeR.spin(vex::directionType::fwd);
+      rollerL.spin(vex::directionType::fwd);
+      rollerR.spin(vex::directionType::fwd);
     }
     else if(joystick.ButtonR2.pressing()){
-      intakeL.setVelocity(-70, vex::percentUnits::pct);
-      intakeR.setVelocity(70, vex::percentUnits::pct);
+      rollerL.setVelocity(-70, vex::percentUnits::pct);
+      rollerR.setVelocity(70, vex::percentUnits::pct);
 
-      intakeL.spin(vex::directionType::fwd);
-      intakeR.spin(vex::directionType::fwd);
+      rollerL.spin(vex::directionType::fwd);
+      rollerR.spin(vex::directionType::fwd);
     }
     else{
-      intakeL.stop(vex::brakeType::hold);
-      intakeR.stop(vex::brakeType::hold);
+      rollerL.stop(vex::brakeType::hold);
+      rollerR.stop(vex::brakeType::hold);
     }
 
     if(joystick.ButtonLeft.pressing()) {
-      driveFL.spin(vex::directionType::fwd, 25, vex::percentUnits::pct);
-      driveBL.spin(vex::directionType::fwd, 25, vex::percentUnits::pct);
-      driveFR.spin(vex::directionType::rev, 25, vex::percentUnits::pct);
-      driveBR.spin(vex::directionType::rev, 25, vex::percentUnits::pct);
+      tilter.spin(vex::directionType::fwd, 25, vex::percentUnits::pct);
     } 
     else if(joystick.ButtonRight.pressing()) {  
-      driveFL.spin(vex::directionType::fwd, -25, vex::percentUnits::pct);
-      driveBL.spin(vex::directionType::fwd, -25, vex::percentUnits::pct);
-      driveFR.spin(vex::directionType::rev, -25, vex::percentUnits::pct);
-      driveBR.spin(vex::directionType::rev, -25, vex::percentUnits::pct);
-    }
-    else if(slowDrive) {
-      driveFL.spin(vex::directionType::fwd, (joystick.Axis3.position(vex::percentUnits::pct)  + joystick.Axis1.position(vex::percentUnits::pct))/3.0, vex::percentUnits::pct);
-      driveBL.spin(vex::directionType::fwd, (-joystick.Axis3.position(vex::percentUnits::pct) - joystick.Axis1.position(vex::percentUnits::pct))/3.0, vex::percentUnits::pct);
-      driveFR.spin(vex::directionType::rev, (joystick.Axis3.position(vex::percentUnits::pct)  - joystick.Axis1.position(vex::percentUnits::pct))/3.0, vex::percentUnits::pct);
-      driveBR.spin(vex::directionType::rev, (-joystick.Axis3.position(vex::percentUnits::pct) + joystick.Axis1.position(vex::percentUnits::pct))/3.0, vex::percentUnits::pct);
-    
-      joystick.Screen.clearScreen();
-      joystick.Screen.print("Slow");
+      tilter.spin(vex::directionType::fwd, -25, vex::percentUnits::pct);
     }
     else {
-      driveFL.spin(vex::directionType::fwd, joystick.Axis3.position(vex::percentUnits::pct)  + joystick.Axis1.position(vex::percentUnits::pct), vex::percentUnits::pct);
-      driveBL.spin(vex::directionType::fwd, -joystick.Axis3.position(vex::percentUnits::pct) - joystick.Axis1.position(vex::percentUnits::pct), vex::percentUnits::pct);
-      driveFR.spin(vex::directionType::rev, joystick.Axis3.position(vex::percentUnits::pct)  - joystick.Axis1.position(vex::percentUnits::pct), vex::percentUnits::pct);
-      driveBR.spin(vex::directionType::rev, -joystick.Axis3.position(vex::percentUnits::pct) + joystick.Axis1.position(vex::percentUnits::pct), vex::percentUnits::pct);      
-    
-      joystick.Screen.clearScreen();
-      joystick.Screen.print("Fast");    
-    }
-
-    if(joystick.ButtonUp.pressing()){
-      vex::task::sleep(100);
-
-      stack();
-    }
-
-    if(joystick.ButtonX.pressing()){
-      vex::task::sleep(100);
-     
-     lift_reset();
+      tilter.stop(vex::brakeType::hold);
     }
 
     if(joystick.ButtonA.pressing()){
-      liftL.setVelocity(25, vex::percentUnits::pct);
-      liftR.setVelocity(25, vex::percentUnits::pct);
+      lift.setVelocity(-25, vex::percentUnits::pct);
 
-      liftL.spin(vex::directionType::fwd);
-      liftR.spin(vex::directionType::fwd);
+      lift.spin(vex::directionType::fwd);
     }
     else if(joystick.ButtonY.pressing()){
-      liftL.setVelocity(-25, vex::percentUnits::pct);
-      liftR.setVelocity(-25, vex::percentUnits::pct);
+      lift.setVelocity(25, vex::percentUnits::pct);
 
-      liftL.spin(vex::directionType::fwd);
-      liftR.spin(vex::directionType::fwd);
+      lift.spin(vex::directionType::fwd);
     }
     else{
-      liftL.stop(vex::brakeType::hold);
-      liftR.stop(vex::brakeType::hold);
+      lift.stop(vex::brakeType::hold);
     }
 
     vex::task::sleep(20); //Sleep the task for a short amount of time to prevent wasted resources. 
   }
 }
 
+void drive(int x, int y) {
+ 
+    driveFL.setVelocity(100-(sqrt(10000-(pow(y+x,2)))), vex::percentUnits::pct);
+    driveFR.setVelocity(100-(sqrt(10000-(pow(y+x,2)))), vex::percentUnits::pct);
+    driveBL.setVelocity(100-(sqrt(10000-(pow(y+x,2)))), vex::percentUnits::pct);
+    driveBR.setVelocity(100-(sqrt(10000-(pow(y+x,2)))), vex::percentUnits::pct);
+
+    driveFL.spin(directionType::fwd);
+    driveFR.spin(directionType::fwd);
+    driveBL.spin(directionType::fwd);
+    driveBR.spin(directionType::fwd);
+}
+
+void score() {
+
+double val = potLift.value(vex::rotationUnits::deg);
+
+  if(height) {
+      while( fabs( (MID_POS - val)) > .1 ){
+        val = potLift.value(vex::rotationUnits::deg);
+
+        double mid_error = MID_POS - val;
+
+        double mid_kP = .100;
+
+        lift.setVelocity(mid_error * mid_kP, vex::percentUnits::pct);
+      }
+        lift.stop(vex::brakeType::hold);
+
+        intake_in();
+        vex::task::sleep(800);
+        intake_stop();
+
+        liftReset(MID_POS, 50);
+  }
+    else {
+      while( fabs( (LOW_POS - val)) > .1 ){
+        val = potLift.value(vex::rotationUnits::deg);
+
+        double low_error = LOW_POS - val;
+
+        double low_kP = .100;
+
+        lift.setVelocity(low_error * low_kP, vex::percentUnits::pct);
+      }
+        lift.stop(vex::brakeType::hold);
+
+        intake_in();
+        vex::task::sleep(800);
+        intake_stop();
+
+        liftReset(LOW_POS, 50);
+    }
+}
+
+void descore() {
+
+double val = potLift.value(vex::rotationUnits::deg);
+
+  if(height) {
+      while( fabs( (MID_POS - val)) > .1 ){
+        val = potLift.value(vex::rotationUnits::deg);
+
+        double mid_error = MID_POS - val;
+
+        double mid_kP = .100;
+
+        lift.setVelocity(mid_error * mid_kP, vex::percentUnits::pct);
+      }
+        lift.stop(vex::brakeType::hold);
+
+        intake_out();
+        vex::task::sleep(800);
+        intake_stop();
+
+        liftReset(MID_POS, 50);
+  }
+    else {
+      while( fabs( (LOW_POS - val)) > .1 ){
+        val = potLift.value(vex::rotationUnits::deg);
+
+        double low_error = LOW_POS - val;
+
+        double low_kP = .100;
+
+        lift.setVelocity(low_error * low_kP, vex::percentUnits::pct);
+      }
+        lift.stop(vex::brakeType::hold);
+
+        intake_out();
+        vex::task::sleep(800);
+        intake_stop();
+
+        liftReset(LOW_POS, 50);
+    }
+}
+
+void liftReset(int pos, double speed) {
+  double val = potLift.value(vex::rotationUnits::deg);
+
+  while(val > 10){
+  lift.spin(vex::directionType::fwd);
+  }
+}
+
+void heightChange() {
+  
+  height = !height;
+  
+  if(height)
+    joystick.Screen.print("Mid");
+  else
+    joystick.Screen.print("Low");
+
+}
+
+void accumulatorTo(int pos){
+
+double val = potLift.value(vex::rotationUnits::deg);
+
+      while( fabs( (pos - val)) > .1 ){
+        val = potTilter.value(vex::rotationUnits::deg);
+
+        double tilter_error = pos - val;
+
+        double tilter_kP = .100;
+
+        tilter.setVelocity(tilter_error * tilter_kP, vex::percentUnits::pct);
+      }
+        tilter.stop(vex::brakeType::hold);
+
+}
+
 void stack() {  
 
   drive_for(0.93 * FULL_TILE);
-  accumulator_to(STACKING_POS);
-  intake_out(30);
+  accumulatorTo(STACKING_POS);
+  intake_out(20);
   task::sleep(800);
   drive_for(-1.0 * FULL_TILE, 20);
-  accumulator_to(INTAKING_POS);
+  accumulatorTo(INTAKING_POS);
 
 }
 
 
 // Main will set up the competition functions and callbacks.
 int main() {
+    //Callback Macros
+    joystick.ButtonUp.pressed(stack);
+    joystick.ButtonX.pressed(heightChange);
+    joystick.ButtonL1.pressed(score);
+    joystick.ButtonL2.pressed(descore);
+
     //Set up callbacks for autonomous and driver control periods.
     Competition.autonomous( autonomous );
     Competition.drivercontrol( usercontrol );
@@ -251,6 +315,7 @@ int main() {
        
     //Prevent main from exiting with an infinite loop.                        
     while(1) {
+      cortex.Screen.printAt(1, 20, "rotation: %f degrees", potTilter.value(rotationUnits::deg));
       vex::task::sleep(100);//Sleep the task for a short amount of time to prevent wasted resources.
     }    
        
