@@ -24,16 +24,24 @@ vex::competition Competition;
 
 vex::controller joystick (vex::controllerType::primary);   
 
-vex::motor driveFL(vex::PORT15, false);
-vex::motor driveBL(vex::PORT16, false);
+vex::motor driveFL(vex::PORT1, false);
 vex::motor driveFR(vex::PORT2, false);
-vex::motor driveBR(vex::PORT8, false);
+vex::motor driveBL(vex::PORT3, false);
+vex::motor driveBR(vex::PORT4, false);
+vex::motor rollerL(vex::PORT5, false);
+vex::motor rollerR(vex::PORT6, false);
+vex::motor lift(vex::PORT7, false);
+vex::motor tilter(vex::PORT8, false);
 
-vex::motor intakeL(vex::PORT4, false);
-vex::motor intakeR(vex::PORT3, false);
-vex::motor liftL(vex::PORT20, false);
-vex::motor liftR(vex::PORT10, false);
+vex::pot potLift(cortex.ThreeWirePort.A);
+vex::pot potTilter(cortex.ThreeWirePort.B);
 
+void drive(int x, int y);
+void score();
+void descore();
+void liftReset(int pos, double speed);
+void heightChange();
+void accumulatorTo(int pos);
 void stack();
 
 void drive_for(int dist, double speed);
@@ -42,6 +50,4 @@ void ccw_turn_for(int angle, double speed);
 void intake_in(double speed);
 void intake_out(double speed);
 void intake_stop();
-void accumulator_to(int pos, double speed);
-void lift_to(int pos, double speed);
-void lift_reset(double speed);
+void lift_reset(int pos, double speed);
