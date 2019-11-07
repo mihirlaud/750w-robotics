@@ -1,4 +1,4 @@
-//#include "C:/Program Files (x86)/VEX Robotics/VEXcode/sdk/vexv5/include/vex_units.h"
+/0/#include "C:/Program Files (x86)/VEX Robotics/VEXcode/sdk/vexv5/include/vex_units.h"
 #include "vex.h"
 #include "Robot.h"
 #include "config.h"
@@ -104,18 +104,19 @@ void usercontrol( void ) {
 
   while (1) {
 
-    drive( joystick.Axis3.position(), joystick.Axis1.position() );
+    drive( joystick.Axis1.position(), joystick.Axis3.position() );
+
 
     if(joystick.ButtonR1.pressing()){
-      rollerL.setVelocity(70, vex::percentUnits::pct);
-      rollerR.setVelocity(-70, vex::percentUnits::pct);
+      rollerL.setVelocity(100, vex::percentUnits::pct);
+      rollerR.setVelocity(-100, vex::percentUnits::pct);
 
       rollerL.spin(vex::directionType::fwd);
       rollerR.spin(vex::directionType::fwd);
     }
     else if(joystick.ButtonR2.pressing()){
-      rollerL.setVelocity(-70, vex::percentUnits::pct);
-      rollerR.setVelocity(70, vex::percentUnits::pct);
+      rollerL.setVelocity(-100, vex::percentUnits::pct);
+      rollerR.setVelocity(100, vex::percentUnits::pct);
 
       rollerL.spin(vex::directionType::fwd);
       rollerR.spin(vex::directionType::fwd);
@@ -126,22 +127,22 @@ void usercontrol( void ) {
     }
 
     if(joystick.ButtonLeft.pressing()) {
-      tilter.spin(vex::directionType::fwd, 25, vex::percentUnits::pct);
+      tilter.spin(vex::directionType::fwd, 50, vex::percentUnits::pct);
     } 
     else if(joystick.ButtonRight.pressing()) {  
-      tilter.spin(vex::directionType::fwd, -25, vex::percentUnits::pct);
+      tilter.spin(vex::directionType::fwd, -50, vex::percentUnits::pct);
     }
     else {
       tilter.stop(vex::brakeType::hold);
     }
 
     if(joystick.ButtonA.pressing()){
-      lift.setVelocity(-25, vex::percentUnits::pct);
+      lift.setVelocity(-40, vex::percentUnits::pct);
 
       lift.spin(vex::directionType::fwd);
     }
     else if(joystick.ButtonY.pressing()){
-      lift.setVelocity(25, vex::percentUnits::pct);
+      lift.setVelocity(40, vex::percentUnits::pct);
 
       lift.spin(vex::directionType::fwd);
     }
@@ -154,12 +155,16 @@ void usercontrol( void ) {
 }
 
 void drive(int x, int y) {
- 
+    driveFL.setVelocity(y + x, vex::percentUnits::pct);
+    driveFR.setVelocity(y - x, vex::percentUnits::pct);
+    driveBL.setVelocity(y + x, vex::percentUnits::pct);
+    driveBR.setVelocity(y - x, vex::percentUnits::pct);
+ /*
     driveFL.setVelocity(100-(sqrt(10000-(pow(y+x,2)))), vex::percentUnits::pct);
     driveFR.setVelocity(100-(sqrt(10000-(pow(y+x,2)))), vex::percentUnits::pct);
     driveBL.setVelocity(100-(sqrt(10000-(pow(y+x,2)))), vex::percentUnits::pct);
     driveBR.setVelocity(100-(sqrt(10000-(pow(y+x,2)))), vex::percentUnits::pct);
-
+*/
     driveFL.spin(directionType::fwd);
     driveFR.spin(directionType::fwd);
     driveBL.spin(directionType::fwd);

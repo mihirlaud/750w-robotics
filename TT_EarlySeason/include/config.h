@@ -1,4 +1,5 @@
 #include "C:/Program Files (x86)/VEX Robotics/VEXcode/sdk/vexv5/include/vex_global.h"
+#include "C:/Program Files (x86)/VEX Robotics/VEXcode/sdk/vexv5/include/vex_triport.h"
 
 //The encoder value needed for the robot to point turn one complete circle
 #define FULL_CIRCLE 1100
@@ -24,14 +25,14 @@ vex::competition Competition;
 
 vex::controller joystick (vex::controllerType::primary);   
 
-vex::motor driveFL(vex::PORT1, false);
-vex::motor driveFR(vex::PORT2, false);
-vex::motor driveBL(vex::PORT3, false);
-vex::motor driveBR(vex::PORT4, false);
-vex::motor rollerL(vex::PORT5, false);
-vex::motor rollerR(vex::PORT6, false);
-vex::motor lift(vex::PORT7, false);
-vex::motor tilter(vex::PORT8, false);
+vex::motor driveFL(vex::PORT9, false);
+vex::motor driveFR(vex::PORT8, true);
+vex::motor driveBL(vex::PORT6, true);
+vex::motor driveBR(vex::PORT7, false);
+vex::motor rollerL(vex::PORT2, false);
+vex::motor rollerR(vex::PORT4, false);
+vex::motor lift(vex::PORT5, false);
+vex::motor tilter(vex::PORT3, false);
 
 vex::pot potLift(cortex.ThreeWirePort.A);
 vex::pot potTilter(cortex.ThreeWirePort.B);
