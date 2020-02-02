@@ -1,4 +1,6 @@
-/0/#include "C:/Program Files (x86)/VEX Robotics/VEXcode/sdk/vexv5/include/vex_units.h"
+//#include "C:/Program Files (x86)/VEX Robotics/VEXcode/sdk/vexv5/include/vex_units.h"
+//#include "C:/Program Files (x86)/VEX Robotics/VEXcode/sdk/vexv5/include/vex_units.h"
+//#include "C:/Program Files (x86)/VEX Robotics/VEXcode/sdk/vexv5/include/vex_units.h"
 #include "vex.h"
 #include "Robot.h"
 #include "config.h"
@@ -8,6 +10,7 @@
 using namespace vex;
 
 bool height = false; //False = Low; True = Mid
+bool slow = false; //False = Slow; True = Fast;
 
 int auton_index = -1;
 void pre_auton( void ) {
@@ -70,8 +73,12 @@ void intake_stop() {
   rollerR.stop(vex::brakeType::hold);
 }
 
+void accumulator_to(int pos, double speed) {
+  tilter.rotateTo(pos, rotationUnits::deg, speed, velocityUnits::pct, true);
+}
+
 void autonomous( void ) {
-  
+  auton_index = 3;
   switch(auton_index) {
     case -1: //TESTING AUTON
 
@@ -92,10 +99,51 @@ void autonomous( void ) {
 
       break;
     case 1: //RED TOWER SIDE
+      intake_in(80);
+      drive_for(1.65 * FULL_TILE, 50);
+      intake_in(30);
+      drive_for(-1.70 * FULL_TILE, 80);
+      drive_for(0.730 * FULL_TILE, 80);
+      cw_turn_for(0.360 * FULL_CIRCLE, 15);
+      drive_for(0.530 * FULL_TILE, 40);
+      intake_stop();
+      task::sleep(150);
+      intake_out(30);
+      task::sleep(500);
+      intake_stop();
+      drive_for(0.150 * FULL_TILE, 10);
+      tilter.spin(directionType::fwd, 100, velocityUnits::pct);
+      task::sleep(750);
+      tilter.stop(brakeType::hold);
+      task::sleep(250);
+      drive_for(0.150 * FULL_TILE, 20);
+      intake_out(40);
+      task::sleep(100);
+      drive_for(-0.500 * FULL_TILE, 30);
       break;
     case 2: //BLUE GOAL SIDE
       break;
     case 3: //BLUE TOWER SIDE
+      intake_in(70);
+      drive_for(1.65 * FULL_TILE, 50);
+      intake_stop();
+      drive_for(-1.70 * FULL_TILE, 80);
+      drive_for(0.730 * FULL_TILE, 80);
+      ccw_turn_for(0.360 * FULL_CIRCLE, 15);
+      drive_for(0.530 * FULL_TILE, 40);
+      intake_stop();
+      task::sleep(150);
+      intake_out(30);
+      task::sleep(500);
+      intake_stop();
+      tilter.spin(directionType::fwd, 100, velocityUnits::pct);
+      task::sleep(1100);
+      tilter.stop(brakeType::hold);
+      task::sleep(250);
+      drive_for(0.150 * FULL_TILE, 20);
+      intake_out(40);
+      task::sleep(100);
+      drive_for(-0.500 * FULL_TILE, 30);
       break;
   }
 }
@@ -104,7 +152,7 @@ void usercontrol( void ) {
 
   while (1) {
 
-    drive( joystick.Axis1.position(), joystick.Axis3.position() );
+    drive( joystick.Axis3.position(), joystick.Axis1.position() );
 
 
     if(joystick.ButtonR1.pressing()){
@@ -126,22 +174,22 @@ void usercontrol( void ) {
       rollerR.stop(vex::brakeType::hold);
     }
 
-    if(joystick.ButtonLeft.pressing()) {
-      tilter.spin(vex::directionType::fwd, 50, vex::percentUnits::pct);
+    if(joystick.ButtonL2.pressing()) {
+      tilter.spin(vex::directionType::fwd, 30, vex::percentUnits::pct);
     } 
-    else if(joystick.ButtonRight.pressing()) {  
-      tilter.spin(vex::directionType::fwd, -50, vex::percentUnits::pct);
+    else if(joystick.ButtonL1.pressing()) {  
+      tilter.spin(vex::directionType::fwd, -30, vex::percentUnits::pct);
     }
     else {
       tilter.stop(vex::brakeType::hold);
     }
 
-    if(joystick.ButtonA.pressing()){
+    if(joystick.ButtonX.pressing()){
       lift.setVelocity(-40, vex::percentUnits::pct);
 
       lift.spin(vex::directionType::fwd);
     }
-    else if(joystick.ButtonY.pressing()){
+    else if(joystick.ButtonB.pressing()){
       lift.setVelocity(40, vex::percentUnits::pct);
 
       lift.spin(vex::directionType::fwd);
@@ -155,10 +203,19 @@ void usercontrol( void ) {
 }
 
 void drive(int x, int y) {
+
+  if(!slow) {
     driveFL.setVelocity(y + x, vex::percentUnits::pct);
     driveFR.setVelocity(y - x, vex::percentUnits::pct);
     driveBL.setVelocity(y + x, vex::percentUnits::pct);
     driveBR.setVelocity(y - x, vex::percentUnits::pct);
+  }
+  else {
+    driveFL.setVelocity((y + x)/2, vex::percentUnits::pct);
+    driveFR.setVelocity((y - x)/2, vex::percentUnits::pct);
+    driveBL.setVelocity((y + x)/2, vex::percentUnits::pct);
+    driveBR.setVelocity((y - x)/2, vex::percentUnits::pct);
+  }
  /*
     driveFL.setVelocity(100-(sqrt(10000-(pow(y+x,2)))), vex::percentUnits::pct);
     driveFR.setVelocity(100-(sqrt(10000-(pow(y+x,2)))), vex::percentUnits::pct);
@@ -302,14 +359,25 @@ void stack() {
 
 }
 
+void speedChange() {
+  
+  slow = !slow;
+
+  if(slow)
+    joystick.Screen.print("Slow");
+  else
+    joystick.Screen.print("Fast");
+}
+
 
 // Main will set up the competition functions and callbacks.
 int main() {
     //Callback Macros
-    joystick.ButtonUp.pressed(stack);
-    joystick.ButtonX.pressed(heightChange);
-    joystick.ButtonL1.pressed(score);
-    joystick.ButtonL2.pressed(descore);
+    //joystick.ButtonUp.pressed(stack);
+    //joystick.ButtonX.pressed(heightChange);
+    //joystick.ButtonL1.pressed(score);
+    //joystick.ButtonL2.pressed(descore);
+    joystick.ButtonUp.pressed(speedChange);
 
     //Set up callbacks for autonomous and driver control periods.
     Competition.autonomous( autonomous );
