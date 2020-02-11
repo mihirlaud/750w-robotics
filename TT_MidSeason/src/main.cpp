@@ -11,7 +11,7 @@ void initialize() {
 	tray.tarePosition();
 	arm.tarePosition();
 	
-	selector();
+	//selector();
 }
 
 void autonomous() {
@@ -31,40 +31,17 @@ void autonomous() {
 		case 3:
 			blue_protected();
 			break;
+		case 4:
+			prog_skills();
+			break;
 	}
-}
-
-
-void macro(/*int stage*/) {
-
-	if(fabs(TILTER_LIFT - tray.getPosition() > 50)) {
-		tray.moveAbsolute(TILTER_LIFT, 100);
-	}
-	else {
-		tray.moveAbsolute(0, 100);
-	}
-
-	// switch(stage) {
-	// 	case 0:
-	// 		arm.moveAbsolute(LIFT_LOW, 100);
-	// 		count++;
-	// 		break;
-	// 	case 1:
-	// 		arm.moveAbsolute(LIFT_MID, 100);
-	// 		count++;
-	// 		break;
-	// 	case 2:
-	// 		arm.moveAbsolute(-6, 100);
-	// 		// tray.moveAbsolute(0, 100);
-	// 		count = 0;
-	// 		break;
-	// }
 }
 
 void opcontrol() {
 	
+	arm.tarePosition();
+	
 	bool l1_RELEASED, l2_RELEASED;
-	int count = 0;
 	while(true) {
 		pros::lcd::clear_line(1);
 		pros::lcd::set_text(1, std::to_string(tray.getPosition()));
@@ -89,10 +66,6 @@ void opcontrol() {
 			tilter(-100);
 		}
 		if(l1_RELEASED || l2_RELEASED) {
-			if(tray.getPosition() < 0) {
-				tray.tarePosition();
-			}
-
 			tilter(0);
 		}
 
@@ -114,23 +87,30 @@ void opcontrol() {
 		else if(r1.isPressed()) {
 			intake(100);
 		}
-		else if(x.isPressed()) {
-			intake(-100);
-		}
 		else if(y.isPressed()) {
 			intake(-30);
+		}
+		else if(x.isPressed()) {
+			intake(-100);
 		}
 		else {
 			intake(0);
 		}
+		
+		if(b.changedToPressed()) {
+			macro_lift();
+		}
 
 
 		if(a.changedToPressed()) {
-			if(tray.getPosition() < 0) {
-				tray.tarePosition();
+			if(fabs(tray.getPosition() - TILTER_LIFT) < 50) {
+				tray.moveAbsolute(0, 100);
+			}	else {
+				if(tray.getPosition() < 0) {
+					tray.tarePosition();
+				}
+				tray.moveAbsolute(TILTER_LIFT, 100);
 			}
-
-			macro(/*count*/);
 		}
 
 

@@ -18,8 +18,11 @@ okapi::ControllerButton shift(okapi::ControllerDigital::R2);
 okapi::ControllerButton x(okapi::ControllerDigital::X);
 okapi::ControllerButton a(okapi::ControllerDigital::A);
 okapi::ControllerButton y(okapi::ControllerDigital::Y);
+okapi::ControllerButton b(okapi::ControllerDigital::B);
 okapi::ControllerButton left(okapi::ControllerDigital::left);
 okapi::ControllerButton right(okapi::ControllerDigital::right);
+
+pros::Imu imu(IMU_PORT);
 
 std::shared_ptr<okapi::ChassisController> chassis = okapi::ChassisControllerBuilder()
 	.withMotors(okapi::MotorGroup({driveBL, driveFL}), okapi::MotorGroup({driveBR, driveFR}))
