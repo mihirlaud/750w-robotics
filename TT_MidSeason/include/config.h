@@ -14,11 +14,11 @@ const int RIGHT_ROLLER = 16;
 const int IMU_PORT = 7;
 
 const double TILTER_LIFT = 350;
-const double LIFT_LOW = 410;
+const double LIFT_LOW = 460;
 const double LIFT_MID = 500;
 
 const double TILTER_MID = 700;
-const double TILTER_FINAL = 820;
+const double TILTER_FINAL = 530;
 const double ONE_FOOT = 1250 / 2;
 const double ONE_DEGREE = 1675 / 360;
 
@@ -59,6 +59,7 @@ void pid_drive(double dist);
 void pid_turn(double dist);
 void imu_turn(double angle);
 void pid_tray(double dist);
+void wall_turn(bool clockwise);
 
 extern int auton_index;
 void selector();

@@ -68,7 +68,7 @@ void pid_drive(double dist) {
 		pros::delay(20);
 		
 		if(accel) {
-			if(maxRate < 180)
+			if(maxRate < 190)
 				maxRate += 10;
 		}
 		
@@ -258,14 +258,28 @@ void pid_tray(double dist) {
 	tray.moveVelocity(0);
 }
 
-int auton_index = 2;
+void wall_turn(bool clockwise) {
+	driveFL.moveVelocity(400  * (clockwise ? 1 : -1));
+	driveBL.moveVelocity(400  * (clockwise ? 1 : -1));
+	driveFR.moveVelocity(-400 * (clockwise ? 1 : -1));
+	driveBR.moveVelocity(-400 * (clockwise ? 1 : -1));
+	
+	pros::delay(750);
+	
+	driveFL.moveVelocity(0);
+	driveBL.moveVelocity(0);
+	driveFR.moveVelocity(0);
+	driveBR.moveVelocity(0);
+}
+
+int auton_index = -1;
 void selector() {
 	joystick.clear();
-	pros::delay(51);
+	pros::delay(100);
 	joystick.setText(1, 0, "ONE POINT?");
 	bool redraw = false;
 	while(!a.changedToPressed()) {
-		pros::delay(50);
+		pros::delay(100);
 		if(left.isPressed()) {
 			auton_index--;
 			redraw = true;
@@ -275,15 +289,19 @@ void selector() {
 		}
 		
 		if(auton_index < -1) {
-			redraw = false;
 			auton_index = 3;
+			joystick.rumble(".");
+			pros::delay(100);
 		} else if(auton_index > 3) {
-			redraw = false;
 			auton_index = -1;
+			joystick.rumble(".");
+			pros::delay(100);
 		}
 		
 		if(redraw) {
-			joystick.clearLine(1);
+			redraw = false;
+			joystick.clear();
+			pros::delay(100);
 			switch(auton_index) {
 				case -1:
 					joystick.setText(1, 0, "ONE POINT?");
@@ -303,8 +321,11 @@ void selector() {
 			}
 		}
 	}
+	pros::delay(100);
 	joystick.clear();
+	pros::delay(100);
 	joystick.rumble(".");
+	pros::delay(100);
 	switch(auton_index) {
 		case -1:
 			joystick.setText(1, 0, "ONE POINT");
@@ -322,6 +343,7 @@ void selector() {
 			joystick.setText(1, 0, "BLUE PROT");
 			break;
 	}
+	pros::delay(200);
 	joystick.setText(2, 0, "SELECTED");
 }
 
@@ -330,6 +352,7 @@ void deploy() {
 	pros::delay(900);
 	intake(0);
 	reg_drive(-0.30 * ONE_FOOT, 100);
+	tray.tarePosition();
 }
 
 void auto_stack() {
@@ -338,8 +361,8 @@ void auto_stack() {
 //	pros::delay(400);
 //	intake(0);
 
-	pid_tray(TILTER_FINAL);
-	pros::delay(100);
+	tilterSlow->setTarget(TILTER_FINAL);
+	tilterSlow->waitUntilSettled();
 	intake(-30);
 	pros::delay(200);
 	
@@ -361,17 +384,18 @@ void red_unprotected() {
 	deploy();
 	lift(-100);
 	intake(100);
-	pid_drive(4.00 * ONE_FOOT);
-	pros::delay(400);
+	pid_drive(4.60 * ONE_FOOT);
+	pros::delay(600);
 	intake(0);
-	pid_drive(-2.80 * ONE_FOOT);
-	pid_turn(141.0 * ONE_DEGREE);
+	pid_drive(-4.70 * ONE_FOOT);
+	wall_turn(true);
 	pid_drive(1.40 * ONE_FOOT);
+	reg_turn(-5 * ONE_DEGREE, 100);
 
 	auto_stack();
 	
-	pros::delay(200);
-	reg_drive(-1.00 * ONE_FOOT, 80);
+	pros::delay(400);
+	reg_drive(-1.00 * ONE_FOOT, 60);
 	intake(0);
 	
 }
@@ -383,11 +407,13 @@ void red_protected() {
 	intake(100);
 	pid_drive(1.60 * ONE_FOOT);
 	pros::delay(500);
-	pid_turn(-100.0 * ONE_DEGREE);
-	pid_drive(1.80 * ONE_FOOT);
+	reg_turn(105 * ONE_DEGREE, 50);
+	pid_drive(2.90 * ONE_FOOT);
 	pros::delay(400);
-	pid_turn(-60.0 * ONE_DEGREE);
-	pid_drive(1.4 * ONE_FOOT);
+	intake(0);
+	pid_drive(-4.00 * ONE_FOOT);
+	wall_turn(true);
+	reg_drive(0.80 * ONE_FOOT, 50);
 
 	auto_stack();
 	
@@ -402,31 +428,36 @@ void blue_unprotected() {
 	deploy();
 	lift(-100);
 	intake(100);
-	pid_drive(4.00 * ONE_FOOT);
-	pros::delay(400);
+	pid_drive(4.60 * ONE_FOOT);
+	pros::delay(600);
 	intake(0);
-	pid_drive(-2.80 * ONE_FOOT);
-	pid_turn(-147.0 * ONE_DEGREE);
+	pid_drive(-4.70 * ONE_FOOT);
+	wall_turn(false);
 	pid_drive(1.40 * ONE_FOOT);
+	reg_turn(5 * ONE_DEGREE, 100);
 
 	auto_stack();
 	
-	pros::delay(200);
-	reg_drive(-1.00 * ONE_FOOT, 80);
+	pros::delay(400);
+	reg_drive(-1.00 * ONE_FOOT, 60);
 	intake(0);
+	
 	
 }
 
 void blue_protected() {
 	deploy();
+	lift(-100);
 	intake(100);
-	pid_drive(1.20 * ONE_FOOT);
-	pros::delay(250);
-	pid_turn(90.0 * ONE_DEGREE);
-	pid_drive(2.00 * ONE_FOOT);
-	pros::delay(250);
-	pid_turn(45.0 * ONE_DEGREE);
-	pid_drive(1.6 * ONE_FOOT);
+	pid_drive(1.60 * ONE_FOOT);
+	pros::delay(500);
+	reg_turn(-105 * ONE_DEGREE, 50);
+	pid_drive(2.90 * ONE_FOOT);
+	pros::delay(400);
+	intake(0);
+	pid_drive(-4.00 * ONE_FOOT);
+	wall_turn(false);
+	reg_drive(0.80 * ONE_FOOT, 50);
 
 	auto_stack();
 	

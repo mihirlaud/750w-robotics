@@ -11,7 +11,7 @@ void initialize() {
 	tray.tarePosition();
 	arm.tarePosition();
 	
-	//selector();
+	selector();
 }
 
 void autonomous() {

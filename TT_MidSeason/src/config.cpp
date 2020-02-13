@@ -4,7 +4,7 @@ okapi::Motor driveFL(FRONT_LEFT_DRIVE, true, okapi::AbstractMotor::gearset::blue
 okapi::Motor driveFR(FRONT_RIGHT_DRIVE, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::degrees);
 okapi::Motor driveBL(BACK_LEFT_DRIVE, true, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::degrees);
 okapi::Motor driveBR(BACK_RIGHT_DRIVE, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::degrees);
-okapi::Motor tray(TRAY, false, okapi::AbstractMotor::gearset::red, okapi::AbstractMotor::encoderUnits::degrees);
+okapi::Motor tray(TRAY, true, okapi::AbstractMotor::gearset::red, okapi::AbstractMotor::encoderUnits::degrees);
 okapi::Motor arm(ARM, true, okapi::AbstractMotor::gearset::red, okapi::AbstractMotor::encoderUnits::degrees);
 okapi::Motor rollerL(LEFT_ROLLER, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
 okapi::Motor rollerR(RIGHT_ROLLER, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
@@ -37,5 +37,5 @@ std::shared_ptr<okapi::AsyncPositionController<double, double>> tilterFast = oka
 
 std::shared_ptr<okapi::AsyncPositionController<double, double>> tilterSlow = okapi::AsyncPosControllerBuilder()
 	.withMotor(okapi::Motor{tray})
-	.withMaxVelocity(40)
+	.withMaxVelocity(60)
 	.build();
